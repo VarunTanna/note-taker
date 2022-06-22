@@ -1,6 +1,5 @@
 // dependencies 
 const express = require("express");
-const res = require("express/lib/response");
 const fs = require("fs");
 const path = require("path");
 
@@ -12,6 +11,7 @@ const PORT = process.env.PORT || 3001;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static('public'));
+const { uuid } = require("./utils/utilis")
 
 app.get('/', function(req, res) {
     res.sendFile(path.join(__dirname, "public/index.html"));
@@ -22,9 +22,23 @@ app.get("/notes", function(req, res) {
 });
 
 app.get("/api/notes", function(req, res) {
-    res.sendFile(path.join(__dirname, "db.json"));
+    res.sendFile(path.join(__dirname, "./db/db.json"));
 });
 
+app.post('/api/notes', (req, res) => {
+    const { title, text } = req.body;
+    if (title && text) {
+        const savedNote = {
+            title, 
+            text,
+            id: uuid(),
+        }
+    }
+})
 
 
 
+
+app.listen(PORT, function() {
+    console.log(`App is listening on Port ${PORT}`);
+});
