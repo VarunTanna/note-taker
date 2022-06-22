@@ -12,6 +12,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static('public'));
 const { uuid } = require("./utils/utilis")
+const notes = require("./db/db.json")
 
 app.get('/', function(req, res) {
     res.sendFile(path.join(__dirname, "public/index.html"));
@@ -25,6 +26,11 @@ app.get("/api/notes", function(req, res) {
     res.sendFile(path.join(__dirname, "./db/db.json"));
 });
 
+app.get('/api/notes', function(req, res) {
+    console.info(`${req.method} request received for notes`);
+    res.json(notes);
+})
+
 app.post('/api/notes', (req, res) => {
     const { title, text } = req.body;
     if (title && text) {
@@ -32,9 +38,17 @@ app.post('/api/notes', (req, res) => {
             title, 
             text,
             id: uuid(),
-        }
-    }
-})
+        };
+        notes.push(savedNote);
+        let noteArray = JSON.stringify((notes), null, 2);
+        fs.writeFile('./db/db.json', noteArray, () => {
+            const response = {
+                body: savedNote,
+            }
+            res.json(response);
+        })
+    };;
+});
 
 
 
