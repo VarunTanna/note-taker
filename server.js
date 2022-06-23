@@ -57,16 +57,27 @@ app.post('/api/notes', (req, res) => {
 
 
 });    
-// delete function 
-app.delete('/api/notes/:id', (req, res) => {
-    console.log(req.params.id)
-     const newNotes = notes.filter(note => {
-        note.id !== req.params.id});
-    res.json(newNotes)
+// delete function found online
+app.delete("/api/notes/:id", (req, res) => {
+    const { id } = req.params;
+    const delNote = notes.findIndex(note => note.id ==id);
+    notes.splice(delNote, 1);
+    return res.send();
+  });
+
+
+
+// my delete function attempt
+
+// app.delete('/api/notes/:id', (req, res) => {
+//     console.log(req.params.id)
+//      const newNotes = notes.filter(note => {
+//         note.id !== req.params.id});
+//     res.json(newNotes)
     
-    console.log(newNotes)
+//     console.log(newNotes)
     
-})
+// })
 
 
 
