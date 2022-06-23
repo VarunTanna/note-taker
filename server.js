@@ -12,7 +12,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static('public'));
 const { uuid } = require("./utils/utilis")
-const notes = require("./db/db.json")
+const notes = require("./db/db.json");
+const req = require("express/lib/request");
+const res = require("express/lib/response");
 
 app.get('/', function(req, res) {
     res.sendFile(path.join(__dirname, "public/index.html"));
@@ -23,7 +25,8 @@ app.get("/notes", function(req, res) {
 });
 
 app.get("/api/notes", function(req, res) {
-    res.sendFile(path.join(__dirname, "./db/db.json"));
+    // res.sendFile(path.join(__dirname, "./db/db.json"));
+    res.json(notes);
 });
 
 app.get('/api/notes', function(req, res) {
@@ -31,7 +34,9 @@ app.get('/api/notes', function(req, res) {
     res.json(notes);
 })
 
+
 app.post('/api/notes', (req, res) => {
+    console.info(`${req.method} request received to add review`);
     const { title, text } = req.body;
     if (title && text) {
         const savedNote = {
@@ -39,20 +44,32 @@ app.post('/api/notes', (req, res) => {
             text,
             id: uuid(),
         };
-        notes.push(savedNote);
-        let noteArray = JSON.stringify((notes), null, 2);
-        fs.writeFile('./db/db.json', noteArray, () => {
-            const response = {
-                body: savedNote,
-            }
-            res.json(response);
-        })
-    };;
-});
+        const response = {
+            status: 'Success',
+            body: savedNote,
+        };
+        notes.push(savedNote)
+        console.log(response);
+        res.status(201).json(response);
+    } else {
+        res.status(500).json();
+    }
 
+
+});    
+// delete function 
+app.delete('/api/notes/:id', (req, res) => {
+    console.log(req.params.id)
+     const newNotes = notes.filter(note => {
+        note.id !== req.params.id});
+    res.json(newNotes)
+    
+    console.log(newNotes)
+    
+})
 
 
 
 app.listen(PORT, function() {
-    console.log(`App is listening on Port ${PORT}`);
+    console.log(`App is listening at http://localhost:${PORT}`);
 });
